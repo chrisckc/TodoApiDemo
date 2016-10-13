@@ -6,6 +6,9 @@ Based on the TodoApi provided in the aspnet documentation, created to demonstrat
 
 To reproduce the serialization issue:
 
+Run this code on a Mac using either dotnet run or VSCode debug session.
+haven't tried this on Windows in VS2015 yet
+
 perform a GET request to:
 http://localhost:5000/api/todo/10000000-1111-1111-1111-111111111111/Notes
 
@@ -16,7 +19,7 @@ due to an exception occurring in json.net when serializing the first note (as wo
 The exception does but not bubble up to the controller, the status code is 200 and we have valid Json (but missing the other 2 notes)
 indicating a successful response, so it would be hard for a client to know there was a problem.
 
-Also, neither the developer exception page or the GlobalExeptionFilter is able catch it.
+Also, neither the developer exception page or the GlobalExceptionFilter is able catch it.
 
 Note the following lines in the console log output:
 
