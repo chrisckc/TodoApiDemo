@@ -12,7 +12,9 @@ haven't tried this on Windows in VS2015 yet
 perform a GET request to:
 http://localhost:5000/api/todo/10000000-1111-1111-1111-111111111111/Notes
 
-This returns the notes for the todo item (REST style), there should be 3 notes returned.
+That url routes to Controllers/TodoController.cs    method: GetNotes(Guid id)
+
+The method returns the notes for the todo item (REST style), there should be 3 notes returned.
 However when the array of 3 notes is serialized only 1 of the 3 note objects is actually serialized
 due to an exception occurring in json.net when serializing the first note (as would be expected due to the self referencing loop).
 
