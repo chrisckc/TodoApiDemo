@@ -34,3 +34,10 @@ Newtonsoft.Json.JsonSerializationException: Self referencing loop detected for p
 
 Microsoft.AspNetCore.Hosting.Internal.WebHost:Information: Request finished in 91.7335ms 200 application/json; charset=utf-8
 
+
+##Update:
+Another test has been added
+perform a GET request to:
+http://localhost:5000/api/api/Values/NotSerializable
+
+This has a similar result with a different kind of serialization error
