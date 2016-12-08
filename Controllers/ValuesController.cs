@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TodoApi.Models;
 
 namespace TodoApi.Controllers
 {
@@ -14,6 +15,13 @@ namespace TodoApi.Controllers
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
+        }
+
+        [HttpGet("NotSerializable")]
+        public IActionResult GetNotSerializable()
+        {
+            NotSerializable test = new NotSerializable { Prop1 = 1, Prop2 = 2};
+            return Ok(test);
         }
 
         // GET api/values/5

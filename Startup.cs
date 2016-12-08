@@ -65,6 +65,8 @@ namespace TodoApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            // This must be enabled this to catch errors that occur during serialization
+            //app.UseResponseBuffering();
 
             app.UseMvc();
         }
