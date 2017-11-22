@@ -16,5 +16,7 @@ namespace TodoApi.Models
 
         //Collections
         public virtual ICollection<Note> Notes { get; set; }
+
+        public bool? test { get; set; }
     }
 }

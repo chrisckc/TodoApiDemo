@@ -24,6 +24,14 @@ namespace TodoApi.Controllers
             return Ok(test);
         }
 
+        [HttpGet("Error")]
+        public IActionResult GetError()
+        {
+            int zero = 0;
+            int error = 1 / zero;
+            return Ok();
+        }
+
         // GET api/values/5
         [HttpGet("{id}")]
         public string Get(int id)

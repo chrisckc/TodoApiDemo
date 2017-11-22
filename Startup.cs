@@ -15,19 +15,27 @@ namespace TodoApi
     public class Startup
     {
 
-        public IConfigurationRoot Configuration { get; }
+        //public IConfigurationRoot Configuration { get; }  // previous dotnet 1.0 method
+        public IConfiguration Configuration { get; }
         public ILoggerFactory LoggerFactory { get; }
 
-        public Startup(IHostingEnvironment env, ILoggerFactory logger)
-        {
-            this.LoggerFactory = logger;
+        // previous dotnet 1.0 method
+        // public Startup(IHostingEnvironment env, ILoggerFactory logger)
+        // {
+        //     this.LoggerFactory = logger;
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+        //     var builder = new ConfigurationBuilder()
+        //         .SetBasePath(env.ContentRootPath)
+        //         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        //         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+        //         .AddEnvironmentVariables();
+        //     Configuration = builder.Build();
+        // }
+
+        public Startup(IConfiguration configuration, ILoggerFactory logger)
+        {
+            Configuration = configuration;
+            LoggerFactory = logger;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -49,8 +57,9 @@ namespace TodoApi
                 });
 
             // Setup global exception filter
-            builder.AddMvcOptions(o => { o.Filters.Add(new GlobalExceptionFilter(this.LoggerFactory)); });
+            //builder.AddMvcOptions(o => { o.Filters.Add(new GlobalExceptionFilter(this.LoggerFactory)); });
 
+            services.AddResponseCompression();
             services.AddSingleton<ITodoRepository, TodoRepository>();
         }
         #endregion
@@ -58,7 +67,9 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            //TODO: fix this line, appsettings.json may now be incorrect for this?
+            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
@@ -68,6 +79,7 @@ namespace TodoApi
             // This must be enabled this to catch errors that occur during serialization
             //app.UseResponseBuffering();
 
+            app.UseResponseCompression();
             app.UseMvc();
         }
     }

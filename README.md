@@ -18,21 +18,7 @@ The method returns the notes for the todo item (REST style), there should be 3 n
 However when the array of 3 notes is serialized only 1 of the 3 note objects is actually serialized
 due to an exception occurring in json.net when serializing the first note (as would be expected due to the self referencing loop).
 
-The exception does but not bubble up to the controller, the status code is 200 and we have valid Json (but missing the other 2 notes)
-indicating a successful response, so it would be hard for a client to know there was a problem.
-
-Also, neither the developer exception page or the GlobalExceptionFilter is able catch it.
-
-Note the following lines in the console log output:
-
-Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware:Error: An unhandled exception has occurred while executing the request
-Newtonsoft.Json.JsonSerializationException: Self referencing loop detected for property 'notes' with type 'System.Collections.Generic.List`1[TodoApi.Models.Note]'. Path ‘[0].todoItem'.
-
-Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware:Warning: The response has already started, the error page middleware will not be executed.
-Microsoft.AspNetCore.Server.Kestrel:Error: Connection id "0HKVJ34SUMOMU": An unhandled exception was thrown by the application.
-Newtonsoft.Json.JsonSerializationException: Self referencing loop detected for property 'notes' with type 'System.Collections.Generic.List`1[TodoApi.Models.Note]'. Path ‘[0].todoItem'.
-
-Microsoft.AspNetCore.Hosting.Internal.WebHost:Information: Request finished in 91.7335ms 200 application/json; charset=utf-8
+The exception does but not bubble up to the controller, the status code is 200 OK
 
 
 ##Update:
