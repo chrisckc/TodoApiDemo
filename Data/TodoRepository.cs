@@ -14,8 +14,11 @@ namespace TodoApi.Data
               new ConcurrentDictionary<Guid, TodoItem>();
 
         private static bool isInitialized = false;
+
+        // Number of todo items to generate
+        // 174 = ~100KB response, 17 = 10KB response, 1 = 730byte response
         private static int todoCount  = 174; // Number of todo items to generate
-        //private static int todoCount  = 17; // Number of todo items to generate
+
 
         public TodoRepository(ILogger<TodoRepository> logger)
         {
@@ -24,6 +27,7 @@ namespace TodoApi.Data
             // this will run the first time the api is called
             if (!isInitialized) {
                 _logger.LogInformation(LogEvents.Info, "Creating seed data...");
+                _logger.LogInformation(LogEvents.Info, "Generating {0} todo items...", todoCount);
                 //Seed it with some data...
                 TodoItem firstTodo = new TodoItem { TodoItemId = new Guid("10000000-1111-1111-1111-111111111111"),
                                                 TodoItemName = "Item1" };

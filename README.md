@@ -2,6 +2,8 @@
 
 Based on the TodoApi provided in the aspnet documentation, created to demonstrate a serialization issue.
 
+This is a work in progress and general test harness for various things, many lines of commented out code are included for reference.
+
 ## Notes
 
 To reproduce the serialization issue:
