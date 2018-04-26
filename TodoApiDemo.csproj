@@ -11,6 +11,9 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
+    <Folder Include="Handlers\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Logging\" />
   </ItemGroup>
 
   <ItemGroup>

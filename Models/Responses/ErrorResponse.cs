@@ -1,4 +1,6 @@
-﻿using TodoApi.Models.DataTransferObjects;
+﻿using System;
+using Newtonsoft.Json;
+using TodoApi.Models.DataTransferObjects;
 
 namespace TodoApi.Models.Responses
 {
@@ -13,8 +15,21 @@ namespace TodoApi.Models.Responses
 
         public string UserMessage { get; set; }
 
+        public DateTime TimeStamp { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string RequestPath { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string RequestMethod { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int StatusCode { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string MoreInfo { get; set; }
 
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public ExceptionDto Exception { get; set; }
 
     }

@@ -29,7 +29,7 @@ In Program.cs , add using for AspNetCore
 using Microsoft.AspNetCore;
 
 
-Using launch settings from /TodoApiDemo/Properties/launchSettings.json an error occured:
+Using launch settings from /TodoApiDemo/Properties/launchSettings.json an error occurred:
 The launch profile "(Default)" could not be applied.
 A usable launch profile could not be located.
 
@@ -45,7 +45,11 @@ delete .vscode/tasks.json
 
 Let vscode offer to recreate the files via the debug menu
 
-edit the 2 "Configuraton" > "program" entries to match the framework version "netcoreapp2.0" and the name of the asssembly dll.
+In launch.json, edit the "program" property in the 2 elements of the "configurations" array entries to match the path of the assembly dll by combining the framework version "netcoreapp2.0" and the name of the assembly dll.
 
 Error: Could not find the preLaunchTask 'build'.
 Let vscode recreate the tasks.json file, click configure task and choose the .NET Core template
+
+
+Build self contained executable for Raspberry Pi
+dotnet publish -c release -o published -r linux-arm

@@ -7,33 +7,37 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using TodoApi.Models;
 using TodoApi.Data;
+using TodoApiDemo.Logging;
 
 namespace TodoApi.Controllers
 {
     [Route("api/[controller]")]
     public class TodoController : Controller
     {
+        public ITodoRepository _todoRepository { get; set; }
         private readonly ILogger<TodoController> _logger;
         
-        public TodoController(ITodoRepository todoItems, ILogger<TodoController> logger)
+        public TodoController(ITodoRepository todoRepository, ILogger<TodoController> logger)
         {
-            TodoItems = todoItems;
+            _todoRepository = todoRepository;
             _logger = logger;
         }
-        public ITodoRepository TodoItems { get; set; }
+
 
         #region snippet_GetAll
-        [HttpGet]
+        [HttpGet] // Matches '/Todo/'
         public IEnumerable<TodoItem> GetAll()
         {
-            return TodoItems.GetAll();
+            _logger.LogInformation(LogEvents.GetItem, "GetAll()");
+            return _todoRepository.GetAll();
         }
         #endregion
 
-        [HttpGet("{id}", Name = "GetTodo")]
+        [HttpGet("{id}", Name = "GetTodo")] // Matches '/Todo/{id}'
         public IActionResult GetById(Guid id)
         {
-            var item = TodoItems.Find(id);
+            _logger.LogInformation(LogEvents.GetItem, "GetById({ID})", id);
+            var item = _todoRepository.Find(id);
             if (item == null)
             {
                 return NotFound();
@@ -45,7 +49,8 @@ namespace TodoApi.Controllers
        [HttpGet("{id}/Notes")] // Matches '/Todo/{id}/Notes'
         public IActionResult GetNotes(Guid id)
         {
-            var item = TodoItems.Find(id);
+            _logger.LogInformation(LogEvents.GetItem, "GetNotes({ID})", id);
+            var item = _todoRepository.Find(id);
 
             if (item == null)
             {
@@ -54,16 +59,16 @@ namespace TodoApi.Controllers
             else
             {
                 ICollection<Note> array = item.Notes;
-                _logger.LogInformation("Note array size: {0}",array.Count);
+                _logger.LogInformation("Note array size: {array.Count}",array.Count);
                 //When the above is serialized only 1 of the 3 note objects are serialized, but the the status code is still 200 indicating a successful response...
-                //Also, neither the developer exception page or the GlobalExeptionFilter catch it.
+                //Also, neither the developer exception page or the GlobalExceptionFilter catch it.
                 //Uncomment the [JsonIgnore] attribute in the Models/Note.cs file to remove the reference loop and see the above working correctly outputting all 3 notes.
                 //Or you can edit the startup.cs and uncomment ReferenceLoopHandling.Ignore 
                 
                 return Ok(array); //comment this line out and uncomment the below code block to see the controller behave as expected and throw an exception with 500 status code
                
 
-                //This code demonstrates the exception occuring inside the controller 
+                //This code demonstrates the exception occurring inside the controller 
                 //and 500 status code correctly being returned
                 //
                 // JsonSerializerSettings settings = new JsonSerializerSettings {
@@ -88,7 +93,7 @@ namespace TodoApi.Controllers
             {
                 return BadRequest();
             }
-            TodoItems.Add(item);
+            _todoRepository.Add(item);
             return CreatedAtRoute("GetTodo", new { id = item.TodoItemId }, item);
         }
         #endregion
@@ -102,13 +107,13 @@ namespace TodoApi.Controllers
                 return BadRequest();
             }
 
-            var todo = TodoItems.Find(id);
+            var todo = _todoRepository.Find(id);
             if (todo == null)
             {
                 return NotFound();
             }
 
-            TodoItems.Update(item);
+            _todoRepository.Update(item);
             return new NoContentResult();
         }
         #endregion
@@ -123,7 +128,7 @@ namespace TodoApi.Controllers
                 return BadRequest();
             }
 
-            var todo = TodoItems.Find(id);
+            var todo = _todoRepository.Find(id);
             if (todo == null)
             {
                 return NotFound();
@@ -131,7 +136,7 @@ namespace TodoApi.Controllers
 
             item.TodoItemId = todo.TodoItemId;
 
-            TodoItems.Update(item);
+            _todoRepository.Update(item);
             return new NoContentResult();
         }
         #endregion
@@ -140,13 +145,13 @@ namespace TodoApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-            var todo = TodoItems.Find(id);
+            var todo = _todoRepository.Find(id);
             if (todo == null)
             {
                 return NotFound();
             }
 
-            TodoItems.Remove(id);
+            _todoRepository.Remove(id);
             return new NoContentResult();
         }
         #endregion

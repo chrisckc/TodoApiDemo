@@ -9,6 +9,12 @@ using Newtonsoft.Json.Serialization;
 using TodoApi.Filters;
 using TodoApi.Models;
 using TodoApi.Data;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using TodoApiDemo.Handlers;
+using System;
 
 namespace TodoApi
 {
@@ -34,8 +40,8 @@ namespace TodoApi
 
         public Startup(IConfiguration configuration, ILoggerFactory logger)
         {
-            Configuration = configuration;
-            LoggerFactory = logger;
+            this.Configuration = configuration;
+            this.LoggerFactory = logger;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -44,6 +50,8 @@ namespace TodoApi
         {
             // Add framework services.
             var builder = services.AddMvc();
+            // Setup global exception filter
+            //var builder = services.AddMvc(config => config.Filters.Add(typeof(GlobalExceptionFilter)));
 
             builder.AddJsonOptions(
                 o =>
@@ -56,30 +64,37 @@ namespace TodoApi
                     //o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
 
-            // Setup global exception filter
-            //builder.AddMvcOptions(o => { o.Filters.Add(new GlobalExceptionFilter(this.LoggerFactory)); });
-
             services.AddResponseCompression();
-            services.AddSingleton<ITodoRepository, TodoRepository>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IExceptionHandler, ExceptionHandler>();
+            services.AddScoped<ITodoRepository, TodoRepository>();
         }
         #endregion
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider, IHostingEnvironment env)
         {
-            //TODO: fix this line, appsettings.json may now be incorrect for this?
-            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddConsole();
-            loggerFactory.AddDebug();
-
+            IExceptionHandler exceptionHandler = serviceProvider.GetService<IExceptionHandler>();
+            //env.EnvironmentName = EnvironmentName.Development;
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
+                exceptionHandler.IncludeException = true;
+                exceptionHandler.IncludeExceptionStacktrace = true;
+            } else {
+                //app.UseExceptionHandler("/api/error");
             }
+
+            app.UseExceptionHandler(options => 
+                options.Run(async context => await exceptionHandler.HandleException(context)));
+            
+            // serves static files from wwwroot dir
+            app.UseStaticFiles();
+            
             // This must be enabled this to catch errors that occur during serialization
             //app.UseResponseBuffering();
 
-            app.UseResponseCompression();
+            // app.UseResponseCompression();
             app.UseMvc();
         }
     }

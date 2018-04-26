@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using System.Net;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Logging;
 
 namespace TodoApi
 {
@@ -40,6 +43,37 @@ namespace TodoApi
                 //     config.Sources.Clear();
                 //     config.AddJsonFile("myconfig.json", optional: true);
                 // })
+                .UseKestrel(options =>
+                {
+                    options.Limits.MaxConcurrentConnections = 100;
+                    options.Limits.MaxConcurrentUpgradedConnections = 100;
+                    options.Limits.MaxRequestBodySize = 10 * 1024;
+                    // The default minimum rates are 240 bytes / second, with a 5 second grace period.
+                    options.Limits.MinRequestBodyDataRate =
+                               new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+                    options.Limits.MinResponseDataRate =
+                               new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+                    //options.Listen(IPAddress.Loopback, 5000);
+                    options.Listen(IPAddress.Any, 5000);
+                   //options.Listen(IPAddress.Loopback, 5001, listenOptions =>
+                   //{
+                   //    listenOptions.UseHttps("testCert.pfx", "testPassword");
+                   //});
+                })
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    // these are added by the default config, AddConsole(); AddDebug();
+                    logging.ClearProviders();
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        logging.AddConsole();
+                        logging.AddDebug();
+                        // this can be controlled in the appsettings.json
+                        //logging.SetMinimumLevel(LogLevel.Debug);
+                        // or
+                        //logging.WithFilter<ConsoleLoggerProvider>(LogLevel.Debug))
+                    }
+                })
                 .Build();
     }
 }

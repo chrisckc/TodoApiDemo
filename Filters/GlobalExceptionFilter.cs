@@ -21,14 +21,14 @@ namespace TodoApi.Filters
         /// Initializes a new instance of the <see cref="GlobalExceptionFilter"/> class.
         /// </summary>
         /// <param name="logger"><see cref="ILoggerFactory"/> instance.</param>
-        public GlobalExceptionFilter(ILoggerFactory logger)
+        public GlobalExceptionFilter(ILoggerFactory loggerFactory)
         {
-            if (logger == null)
+            if (loggerFactory == null)
             {
-                throw new ArgumentNullException(nameof(logger));
+                throw new ArgumentNullException(nameof(loggerFactory));
             }
 
-            this._logger = logger.CreateLogger("Global Exception Filter");
+            this._logger = loggerFactory.CreateLogger("Global Exception Filter");
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace TodoApi.Filters
                 DeclaredType = typeof(ErrorResponse)
             };
 
-            this._logger.LogError("Exception: ", context.Exception);
+            this._logger.LogError("Exception: {exception}", context.Exception);
         }
 
         private ExceptionDto GetExceptionDto(Exception exception) 
